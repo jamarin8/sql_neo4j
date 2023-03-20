@@ -26,7 +26,7 @@ password = "mypassword"
 print('running sql connect file...')
 
 driver_sql = "ODBC Driver 17 for SQL Server"
-server = "EC2AMAZ-VOB6UK7"
+server = "EC2AMAZ-XXX"
 database = "test"
 
 conn_str = (
