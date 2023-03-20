@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<head>
+<style>
+
+* {
+  font-family:'Georgia', serif;
+}
+
+body {
+    color:darkyellow;
+    font-weight:bold;
+    font-stretch:expanded;
+  }
+
+table {
+  border-collapse:collapse;
+  border:1px solid black;
+  width:40%;
+  table-layout:auto;
+  font-size:12px;
+  color:darkgrey;
+  /* padding:100px; */
+  /* column-gap:100px; */
+  }
+th, td {
+  border:1px solid black;
+
+}
+
+td.c0 {
+  color:black;
+}
+
+td.c1 {
+  color:red;
+}
+
+tr.fraud {
+  background-color: yellow;
+}
+</style>
+</head>
+
+<!-- <h1> ASB Search Tool v0.1 </h1><br> -->
+<body>
+<h1> ASB Search Tool v0.1 </h1>
+{%if sql_load_chron | length == 2%}
+<h5> GDS/BIS last full data load: {{sql_load_chron[0]}} UTC, GDS/BIS last update: {{sql_load_chron[1]}} UTC</h5>
+{% else %}
+<h5> GDS/BIS last full data load: {{sql_load_chron[0]}} UTC</h5>
+{% endif %}
+
+
+<form action="/" method="GET">
+    <input name="account_id" id="account_id" type="string" />
+    <button type="submit">SEARCH ACCOUNT ID</button>
+</form>
+
+<h2> CAPTURED PII MATCHES FOR {{acct_id}}: {{num_connecting}} CONNECTING ACCOUNT(S)</h2>
+
+<table>
+  <TR>
+  <th>NAME_DOB</th>
+  <th>ACCOUNT_ID</th>
+  <th>BUSINESS_NAME_LEGAL</th>
+  <th>BUSINESS_NAME_DBA</th>
+  <th>BUSINESS_ADDRESS</th>
+  <th>BUSINESS_PHONE</th>
+  <th>MOBILE_PHONE</th>
+  <th>EIN</th>
+  <th>SSN</th>
+  <th>EMAIL</th>
+  <th>ADDRESS</th>
+  <th>IP</th>
+
+  </TR>
+{% for item in susp_app %}
+
+{%if item[12] == '1'%}
+   <TR class='fraud'>
+{% else %}
+   <TR>
+{% endif %}
+
+   <TD class="c2">{{item[0]}}</TD>
+
+   {%if item[1] == acct_id%}
+      <TD class="c0">{{item[1]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[1]}}</TD>
+   {% endif %}
+
+   {%if item[2] in duplicates and item[2] != 'NULL'%}
+      <TD class="c1">{{item[2]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[2]}}</TD>
+   {% endif %}
+
+   {%if item[3] in duplicates and item[3] != 'NULL'%}
+      <TD class="c1">{{item[3]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[3]}}</TD>
+   {% endif %}
+
+   {%if item[4] in duplicates and item[4] != 'NULL'%}
+      <TD class="c1">{{item[4]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[4]}}</TD>
+   {% endif %}
+
+   {%if item[5] in duplicates and item[5] != 'NULL'%}
+      <TD class="c1">{{item[5]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[5]}}</TD>
+   {% endif %}
+
+   {%if item[6] in duplicates and item[6] != 'NULL'%}
+      <TD class="c1">{{item[6]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[6]}}</TD>
+   {% endif %}
+
+   {%if item[7] in duplicates and item[7] != 'NULL'%}
+      <TD class="c1">MATCH</TD>
+   {% else %}
+      <TD class="c2">NO MATCH</TD>
+   {% endif %}
+
+   {%if item[8] in duplicates and item[8] != 'NULL'%}
+      <TD class="c1">MATCH</TD>
+   {% else %}
+      <TD class="c2">NO MATCH</TD>
+   {% endif %}
+
+   {%if item[9] in duplicates and item[9] != 'NULL'%}
+      <TD class="c1">{{item[9]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[9]}}</TD>
+   {% endif %}
+
+   {%if item[10] in duplicates and item[10] != 'NULL'%}
+      <TD class="c1">{{item[10]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[10]}}</TD>
+   {% endif %}
+
+   {%if item[11] in duplicates and item[11] != 'NULL'%}
+      <TD class="c1">MATCH</TD>
+   {% else %}
+      <TD class="c2">NO MATCH</TD>
+   {% endif %}
+
+</TR>
+{% endfor %}
+</table>
+
+</body>
