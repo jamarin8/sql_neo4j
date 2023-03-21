@@ -252,13 +252,18 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     account_id = request.args.get('account_id')
+    start_time = time.perf_counter()
     job3()
     results, duplicate_entries = getresults(account_id)
+    end_time = time.perf_counter()
+    elapsed_time = round(end_time - start_time, 4)
     num_connecting = len(results)
     sql_load_chron = log_update()
     return render_template('home.html', susp_app=results,
                            duplicates=duplicate_entries, acct_id=account_id,
-                           num_connecting=num_connecting, sql_load_chron=sql_load_chron[-2:])
+                           num_connecting=num_connecting,
+                           sql_load_chron=sql_load_chron[-2:],
+                           elapsed_time=elapsed_time)
 
 
 @app.route('/about')
