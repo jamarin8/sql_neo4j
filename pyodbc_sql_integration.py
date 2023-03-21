@@ -219,7 +219,7 @@ def job2():
                 if statement.strip():
                     session.run(statement)
 
-    with open(r"C:\Users\Administrator\Documents\SQL_Helpers_Neo4j\neo4j_flask_app_dir\smb_import_mar23.cql",
+    with open(r"C:\Users\Administrator\Documents\SQL_Helpers_Neo4j\neo4j_flask_app_dir\smb_import_job3.cql",
               "r") as file:
         cypher_query = file.read()
         # Replace the placeholder in the .cql file with the actual CSV file path
