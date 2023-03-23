@@ -231,8 +231,19 @@ def log_update():
     with open('output.log', 'r') as file:
         lines = file.readlines()
 
-    info_regex = re.compile(r'.*INFO.*created')
-    info_lines = [line for line in lines if info_regex.match(line)]
+    job1_regex = re.compile(r'.*INFO.*job1.*created')
+    job1_line = [line for line in lines if job1_regex.match(line)]
+    job2_regex = re.compile(r'.*INFO.*job2.*created')
+    job2_line = [line for line in lines if job2_regex.match(line)]
+    job3_regex = re.compile(r'.*INFO.*job3.*created')
+    job3_line = [line for line in lines if job3_regex.match(line)]
+
+    if job2_line:
+        job1_line.extend([job2_line[-1]])
+    if job3_line:
+        job1_line.extend([job3_line[-1]])
+
+    info_lines = job1_line
 
     timestamp_regex = re.compile(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}')
 
@@ -262,7 +273,7 @@ def home():
     return render_template('home.html', susp_app=results,
                            duplicates=duplicate_entries, acct_id=account_id,
                            num_connecting=num_connecting,
-                           sql_load_chron=sql_load_chron[-2:],
+                           sql_load_chron=sql_load_chron,
                            elapsed_time=elapsed_time)
 
 
