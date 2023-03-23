@@ -261,8 +261,8 @@ def create_iso_date(hour, minute, second):
 # add jobs to scheduler
 # {'id': 'job2', 'time': create_iso_date(2,0,0), 'func': job2}
 jobs = [
-    {'id': 'job1', 'time': create_iso_date_now(), 'func': job1},
-    {'id': 'job2', 'time': create_iso_date_now(45), 'func': job2}
+    {'id': 'job1', 'time': create_iso_date_now(3), 'func': job1},
+    {'id': 'job2', 'time': create_iso_date_now(20), 'func': job2}
 ]
 
 for job in jobs:
