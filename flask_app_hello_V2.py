@@ -12,7 +12,11 @@ import shutil
 from logging_config import setup_logger
 from typing import List
 
+from helpers import clean_dates
+from helpers_viz import visualize_object
+
 logger = setup_logger('output.log')
+
 
 # LINE BELOW NOT NECESSARY FOR PYMSSQL
 # driver_sql="ODBC Driver 17 for SQL Server"
@@ -69,9 +73,16 @@ def sql_records_intake_clean(job, server, username, password):
     df_out['SubmissionDate'] = df_out['SubmissionDate'].dt.strftime('%Y-%m-%d')
 
     df_out['DOB'] = df_out['DOB'].astype(str)
-    if 250125 in df_out['AccountID']:
-        if df_out.loc[250125, 'DOB'] == '9661-05-01 00:00:00':
-            df_out.loc[250125, 'DOB'] = '1966-01-15 00:00:00'
+
+    df_out = clean_dates(df_out, 'DOB')
+
+    # if 250125 in df_out['AccountID']:
+    #     if df_out.loc[250125, 'DOB'] == '9661-05-01 00:00:00':
+    #         df_out.loc[250125, 'DOB'] = '1966-01-15 00:00:00'
+
+    if df_out.loc[250125, 'DOB']:
+        assert df_out.loc[250125, 'DOB'] == '1966-01-15 00:00:00', "Date fix clean dates did not work".upper()
+
     df_out['DOB'] = pd.to_datetime(df_out['DOB'])
     df_out['DOB'] = df_out['DOB'].dt.strftime('%Y-%m-%d')
     df_out['NAME_DOB'] = df_out.agg('{0[FirstName]}_{0[LastName]}_{0[DOB]}'.format, axis=1).map(lambda x: x.upper())
@@ -188,7 +199,6 @@ def job3(server, username, password, driver_neo4j):
 
 
 def fraud_query(tx, account_id):
-
     search = """
     MATCH path=(a:Application)-[*1..4]-(e:Application) WHERE a<>e AND a.account_id = $account_id RETURN path LIMIT 300
     """
@@ -212,7 +222,7 @@ def fraud_query(tx, account_id):
     first = [x for x in list(friends) if x[1] == account_id]
     rest = [x for x in list(friends) if x[1] != account_id]
     rest.sort(key=lambda x: int(x[1]))
-    combined = first + rest
+    combined_results = first + rest
 
     print('parse_results', combined)
 
@@ -231,7 +241,7 @@ def fraud_query(tx, account_id):
         return dups
 
     duplicate_entries = capture_duplicates_in_df(friends)
-    return combined, duplicate_entries
+    return results, combined_results, duplicate_entries
 
 
 def getresults(account_id, driver_neo4j):
@@ -273,20 +283,24 @@ def log_update() -> List[str]:
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def home():
     account_id = request.args.get('account_id')
     start_time = time.perf_counter()
     job3(sql_server, sql_username, sql_password, driver_neo)
-    results, duplicate_entries = getresults(account_id, driver_neo)
+    results, combined_results, duplicate_entries = getresults(account_id, driver_neo)
+    graph = visualize_object(driver, results)
     end_time = time.perf_counter()
     elapsed_time = round(end_time - start_time, 4)
     num_connecting = len(results)
     sql_load_chron = log_update()
-    return render_template('home_old.html', susp_app=results,
+    return render_template('home_old.html', susp_app=combined_results,
                            duplicates=duplicate_entries, acct_id=account_id,
                            num_connecting=num_connecting,
-                           sql_load_chron=sql_load_chron, elapsed_time=elapsed_time)
+                           sql_load_chron=sql_load_chron,
+                           graph=graph,
+                           elapsed_time=elapsed_time)
 
 
 @app.route('/about')
