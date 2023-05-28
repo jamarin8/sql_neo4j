@@ -1,21 +1,20 @@
-
 def visualize_object(driver, results):
     graph = {
         "nodes": [
             {
-                "account_id": result["n"]["account_id"],
+                "account_id": result["account_id"],
                 "label": "Application",
-                "name_dob": result["n"]["name_dob"],
-                "business_name_legal": result["n"]["business_name_legal"],
-                "business_name_dba": result["n"]["business_name_dba"],
-                "business_address": result["n"]["business_address"],
-                "business_phone": result["n"]["business_phone"],
-                "mobile_phone": result["n"]["mobile_phone"],
-                "ein": result["n"]["ein"],
-                "ssn": result["n"]["ssn"],
-                "email_address": result["n"]["email_address"],
-                "address": result["n"]["address"],
-                "ip_address": result["n"]["ip_address"]
+                "name_dob": result["name_dob"],
+                "business_name_legal": result["business_name_legal"],
+                "business_name_dba": result["business_name_dba"],
+                "business_address": result["business_address"],
+                "business_phone": result["business_phone"],
+                "mobile_phone": result["mobile_phone"],
+                "ein": result["ein"],
+                "ssn": result["ssn"],
+                "email_address": result["email_address"],
+                "address": result["address"],
+                "ip_address": result["ip_address"]
             }
             for result in results
         ],
@@ -29,12 +28,11 @@ def visualize_object(driver, results):
 
     for key in keys:
         for result in results:
-            for relationship in result["n"][key]:
+            for relationship in result[key]:  # Assuming result[key] is a list of relationship dictionaries
                 graph["relationships"].append({
-                    "startNode": result["n"]["account_id"],
-                    "endNode": relationship["account_id"],
+                    "startNode": result["account_id"],
+                    "endNode": relationship["account_id"],  # Assuming relationship is a dictionary with an "account_id" key
                     "type": key.upper()
                 })
 
     return graph
-
