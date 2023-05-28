@@ -1,6 +1,16 @@
 
 from itertools import permutations
 
+results_dict = []
+for record in results:
+    path = []
+    for node in record['path'].nodes:
+        path.append(node._properties)
+    for relationship in record['path'].relationships:
+        path.append(relationship._properties)
+    results_dict.append({'path': path})
+
+
 def fix_year(year: object, min_year: object = 1900, max_year: object = 2023) -> object:
     """Attempt to fix an out-of-range year by permuting its digits."""
     perms = [''.join(p) for p in permutations(year)]
