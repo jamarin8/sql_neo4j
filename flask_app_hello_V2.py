@@ -302,12 +302,5 @@ def home():
                            graph=graph,
                            elapsed_time=elapsed_time)
 
-
-@app.route('/about')
-def about():
-    return "<h3><br>Amount's ASB Search Tool {} finds Applications with Duplicate PII {}</h3>". \
-        format('how to search optimally', 'mitigation protocol')
-
-
 if __name__ == '__main__':
     app.run(debug=True, host="127.0.0.1", port=5001)
