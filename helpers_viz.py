@@ -41,3 +41,19 @@ def visualize_object(driver, data):
                     })
 
     return graph
+
+def check_types(obj):
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            print(f"Key: {key}, Type: {type(value)}")
+            check_types(value)
+    elif isinstance(obj, list):
+        for i, item in enumerate(obj):
+            print(f"List Index: {i}, Type: {type(item)}")
+            check_types(item)
+    else:
+        print(f"Type: {type(obj)}")
+
+# Call the function on your graph dictionary
+check_types(graph)
+
