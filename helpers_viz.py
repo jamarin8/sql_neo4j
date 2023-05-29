@@ -84,20 +84,16 @@ def visualize_object_2(driver, data):
             })
 
         for relationship in relationships:
-            # Find the type of the relationship
-            type_of_relationship = [key for key in relationship if key in keys]
-            if not type_of_relationship:
-                print(f"Warning: Skipping a relationship without a corresponding type: {relationship}")
-                continue
-
-            for type_rel in type_of_relationship:
-                graph["relationships"].append({
-                    "startNode": nodes[0].get("account_id"),
-                    "endNode": nodes[1].get("account_id"),
-                    "type": type_rel.upper(),
-                })
+            for key in relationship:
+                if key in keys:
+                    graph["relationships"].append({
+                        "startNode": nodes[0].get("account_id"),
+                        "endNode": nodes[1].get("account_id"),
+                        "type": key.upper()
+                    })
 
     return graph
+
 
 
 
