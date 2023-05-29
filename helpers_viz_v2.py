@@ -32,9 +32,21 @@ def visualize_object(driver, data):
             'fraud_flag']
 
     for record in data:
-        for node in record["nodes"]:
+        nodes = record["nodes"]
+        relationships = record["relationships"]
+
+        if len(nodes) < 2:
+            print(f"Warning: Skipping a path with fewer than two nodes: {nodes}")
+            continue
+
+        for node in nodes:
+            account_id = node.get("account_id")
+            if account_id is None:
+                print(f"Warning: Skipping a node without an account ID: {node}")
+                continue
+
             graph["nodes"].append({
-                "account_id": node.get("account_id"),
+                "account_id": account_id,
                 "label": "Application",
                 "name_dob": node.get("name_dob"),
                 "business_name_legal": node.get("business_name_legal"),
@@ -49,13 +61,18 @@ def visualize_object(driver, data):
                 "ip_address": node.get("ip_address")
             })
 
-        for relationship in record["relationships"]:
+        for i, relationship in enumerate(relationships):
+            if i+1 >= len(nodes):
+                print(f"Warning: Skipping a relationship without a corresponding end node: {relationship}")
+                continue
+
             for key in keys:
                 if key in relationship:
                     graph["relationships"].append({
-                        "startNode": relationship.get("startNode"),
-                        "endNode": relationship.get("endNode"),
+                        "startNode": nodes[i].get("account_id"),
+                        "endNode": nodes[i+1].get("account_id"),
                         "type": key.upper()
                     })
 
     return graph
+
