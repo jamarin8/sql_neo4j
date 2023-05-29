@@ -34,6 +34,11 @@ for record in results_dict:
             else:
                 rest.add(friend_tuple)
 
+first_list = list(first)
+rest_list = list(rest)
+rest_list.sort(key=lambda x: int(x[1]))
+combined_results = first_list + rest_list
+
 def fix_year(year: object, min_year: object = 1900, max_year: object = 2023) -> object:
     """Attempt to fix an out-of-range year by permuting its digits."""
     perms = [''.join(p) for p in permutations(year)]
