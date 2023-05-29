@@ -42,6 +42,7 @@ def visualize_object(driver, data):
 
     return graph
 
+
 def visualize_object_2(driver, data):
     graph = {
         "nodes": [],
@@ -61,7 +62,7 @@ def visualize_object_2(driver, data):
             print(f"Warning: Skipping a path with fewer than two nodes: {nodes}")
             continue
 
-        for node in nodes:
+        for i, node in enumerate(nodes):
             account_id = node.get("account_id")
             if account_id is None:
                 print(f"Warning: Skipping a node without an account ID: {node}")
@@ -83,19 +84,18 @@ def visualize_object_2(driver, data):
                 "ip_address": node.get("ip_address")
             })
 
-        for relationship in relationships:
-            for key in relationship:
-                if key in keys:
-                    graph["relationships"].append({
-                        "startNode": nodes[0].get("account_id"),
-                        "endNode": nodes[1].get("account_id"),
-                        "type": key.upper()
-                    })
+            # If there's a next node and a relationship, create an edge
+            if i < len(nodes) - 1 and i < len(relationships):
+                for relationship in relationships:
+                    for key in relationship:
+                        if key in keys:
+                            graph["relationships"].append({
+                                "startNode": nodes[i].get("account_id"),
+                                "endNode": nodes[i + 1].get("account_id"),
+                                "type": key.upper()
+                            })
 
     return graph
-
-
-
 
 
 def check_types(obj):
