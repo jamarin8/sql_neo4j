@@ -1,35 +1,35 @@
-data = []
+def data_refactor(results_dict):
+    data = []
 
-# Distinguishing attributes for nodes
-node_keys = {'name_dob', 'account_id', 'business_name_legal',
-             'business_name_dba', 'business_address', 'business_phone',
-             'mobile_phone', 'ein', 'ssn', 'email_address', 'address', 'ip_address',
-             'fraud_flag'}
+    for result in results:
+        path = result['path']
+        nodes = []
+        relationships = []
 
-for record in results_dict:
-    path = record['path']
-    nodes = []
-    relationships = []
-    if path:  # path is not empty
-        central_node = path[0].get("account_id", "")
-    for r in path:
-        if isinstance(r, dict):
-            if any(key in r for key in node_keys):
-                node = {
-                    key: r.get(key, 'NULL').strip() for key in node_keys
-                }
-                nodes.append(node)
-                # Each node is also considered a relationship
-                if central_node and node.get("account_id") != central_node:
-                    relationships.append({"startNode": central_node, "endNode": node.get("account_id"), "properties": node})
+        for i in range(0, len(path)):
+            if i % 2 == 0:  # nodes are at even indices
+                nodes.append(path[i])
+            else:  # relationships are at odd indices
+                relationships.append(path[i])
 
-    data.append({"nodes": nodes, "relationships": relationships})
+        data.append({
+            "nodes": nodes,
+            "relationships": relationships
+        })
+
+    return data
+
 
 def visualize_object(driver, data):
     graph = {
         "nodes": [],
         "relationships": []
     }
+
+    keys = ['name_dob', 'account_id', 'business_name_legal',
+            'business_name_dba', 'business_address', 'business_phone',
+            'mobile_phone', 'ein', 'ssn', 'email_address', 'address', 'ip_address',
+            'fraud_flag']
 
     for record in data:
         for node in record["nodes"]:
@@ -48,12 +48,14 @@ def visualize_object(driver, data):
                 "address": node.get("address"),
                 "ip_address": node.get("ip_address")
             })
+
         for relationship in record["relationships"]:
-            graph["relationships"].append({
-                "startNode": relationship.get("startNode"),
-                "endNode": relationship.get("endNode"),
-                "type": "LINKED_TO",
-                "properties": relationship.get("properties")
-            })
+            for key in keys:
+                if key in relationship:
+                    graph["relationships"].append({
+                        "startNode": relationship.get("startNode"),
+                        "endNode": relationship.get("endNode"),
+                        "type": key.upper()
+                    })
 
     return graph
