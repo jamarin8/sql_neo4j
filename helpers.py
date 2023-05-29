@@ -10,6 +10,29 @@ for record in results:
         path.append(relationship._properties)
     results_dict.append({'path': path})
 
+#
+
+friends = set()
+first = set()
+rest = set()
+
+for record in results_dict:
+    path = record['path']
+    for r in path:
+        if isinstance(r, dict) and 'account_id' in r.keys():
+            friend_tuple = (
+                r.get('name_dob', '').strip(), r.get('account_id', '').strip(), r.get('business_name_legal', 'NULL').strip(),
+                r.get('business_name_dba', 'NULL').strip(), r.get('business_address', 'NULL').strip(),
+                r.get('business_phone', 'NULL').strip(), r.get('mobile_phone', 'NULL').strip(),
+                r.get('ein', 'NULL').strip(), r.get('ssn', 'NULL').strip(),
+                r.get('email_address', 'NULL').strip(), r.get('address', 'NULL').strip(),
+                r.get('ip_address', 'NULL').strip(), r.get('fraud_flag', 'NULL').strip()
+            )
+            friends.add(friend_tuple)
+            if friend_tuple[1] == account_id:
+                first.add(friend_tuple)
+            else:
+                rest.add(friend_tuple)
 
 def fix_year(year: object, min_year: object = 1900, max_year: object = 2023) -> object:
     """Attempt to fix an out-of-range year by permuting its digits."""
