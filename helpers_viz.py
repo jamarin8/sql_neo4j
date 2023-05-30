@@ -97,6 +97,29 @@ def visualize_object_2(driver, data):
 
     return graph
 
+def transform_data_to_graph(data):
+    graph = {
+        "nodes": [],
+        "relationships": []
+    }
+
+    for record in data:
+        nodes = record["nodes"]
+        relationships = record["relationships"]
+
+        # Flatten nodes
+        for node in nodes:
+            if node not in graph['nodes']:
+                graph['nodes'].append(node)
+
+        # Process each pair of nodes with their corresponding relationship
+        for i in range(len(nodes) - 1):
+            for relationship in relationships:
+                for key in relationship.keys():
+                    edge = {"startNode": nodes[i]["id"], "endNode": nodes[i + 1]["id"], key: relationship[key]}
+                    graph["relationships"].append(edge)
+
+    return graph
 
 def check_types(obj):
     if isinstance(obj, dict):
