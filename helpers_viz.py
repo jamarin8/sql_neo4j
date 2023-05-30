@@ -121,6 +121,51 @@ def transform_data_to_graph(data):
 
     return graph
 
+
+import math
+
+
+def transform_data_to_graph_(data):
+    graph = {
+        "nodes": [],
+        "relationships": []
+    }
+
+    center_x = 200
+    center_y = 200
+    radius = 100
+
+    for i, record in enumerate(data):
+        nodes = record["nodes"]
+        relationships = record["relationships"]
+
+        for j, node in enumerate(nodes):
+            if node not in graph["nodes"]:
+                node_with_coordinates = node.copy()
+
+                # Calculate angle based on node's position in the list
+                angle = 2 * math.pi * j / len(nodes)
+
+                # Calculate x and y based on angle
+                node_with_coordinates["x"] = center_x + radius * math.cos(angle)
+                node_with_coordinates["y"] = center_y + radius * math.sin(angle)
+
+                graph["nodes"].append(node_with_coordinates)
+
+        for i in range(len(nodes) - 1):
+            for relationship in relationships:
+                for key, value in relationship.items():
+                    graph["relationships"].append({
+                        "startNode": nodes[i]["id"],
+                        "endNode": nodes[i + 1]["id"],
+                        "type": key,
+                        "value": value
+                    })
+
+    return graph
+
+
+
 def check_types(obj):
     if isinstance(obj, dict):
         for key, value in obj.items():
