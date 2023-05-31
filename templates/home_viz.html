@@ -1,37 +1,243 @@
+
+<!DOCTYPE html>
+
+<head>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<style>
+.node {
+    fill: #ccc;
+}
+.edge {
+    stroke: #000;
+}
+.node text {
+   font-size: 12px;
+}
+.edge text {
+   font-size: 12px;
+}
+.node-label,
+.edge-label {
+    fill: #000;
+}
+
+* {
+  font-family:'Georgia', serif;
+}
+
+body {
+    color:darkyellow;
+    font-weight:bold;
+    font-stretch:expanded;
+  }
+
+table {
+  border-collapse:collapse;
+  border:1px solid black;
+  width:40%;
+  table-layout:auto;
+  font-size:12px;
+  color:darkgrey;
+  /* padding:100px; */
+  /* column-gap:100px; */
+  }
+th, td {
+  border:1px solid black;
+
+}
+
+td.c0 {
+  color:black;
+}
+
+td.c1 {
+  color:red;
+}
+
+tr.fraud {
+  background-color: yellow;
+}
+</style>
+</head>
+
+<!-- <h1> ASB Search Tool v0.1 </h1><br> -->
+<body>
+<h1> ASB Search Tool v0.1 </h1><br>
+
+{% if session %}
+    <h1>Welcome {{session.userinfo.name}}!</h1>
+    <p><a href="/logout">Logout</a></p>
+    <div><pre>{{pretty}}</pre></div>
+{% else %}
+    <h1>Welcome Guest</h1>
+    <p><a href="/login">Login</a></p>
+{% endif %}
+
+<form action="/" method="GET">
+    <input name="account_id" id="account_id" type="string" />
+    <button type="submit">SEARCH ACCOUNT ID</button>
+</form>
+
+<h2> CAPTURED PII MATCHES FOR {{acct_id}}: {{num_connecting}} CONNECTING ACCOUNT(S)</h2>
+
+<table>
+  <TR>
+  <th>NAME_DOB</th>
+  <th>ACCOUNT_ID</th>
+  <th>BUSINESS_NAME_LEGAL</th>
+  <th>BUSINESS_NAME_DBA</th>
+  <th>BUSINESS_ADDRESS</th>
+  <th>BUSINESS_PHONE</th>
+  <th>MOBILE_PHONE</th>
+  <th>EIN</th>
+  <th>SSN</th>
+  <th>EMAIL</th>
+  <th>ADDRESS</th>
+  <th>IP</th>
+
+  </TR>
+{% for item in susp_app %}
+
+{%if item[12] == '1'%}
+   <TR class='fraud'>
+{% else %}
+   <TR>
+{% endif %}
+
+   <TD class="c2">{{item[0]}}</TD>
+
+   {%if item[1] == acct_id%}
+      <TD class="c0">{{item[1]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[1]}}</TD>
+   {% endif %}
+
+   {%if item[2] in duplicates and item[2] != 'NULL'%}
+      <TD class="c1">{{item[2]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[2]}}</TD>
+   {% endif %}
+
+   {%if item[3] in duplicates and item[3] != 'NULL'%}
+      <TD class="c1">{{item[3]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[3]}}</TD>
+   {% endif %}
+
+   {%if item[4] in duplicates and item[4] != 'NULL'%}
+      <TD class="c1">{{item[4]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[4]}}</TD>
+   {% endif %}
+
+   {%if item[5] in duplicates and item[5] != 'NULL'%}
+      <TD class="c1">{{item[5]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[5]}}</TD>
+   {% endif %}
+
+   {%if item[6] in duplicates and item[6] != 'NULL'%}
+      <TD class="c1">{{item[6]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[6]}}</TD>
+   {% endif %}
+
+   {%if item[7] in duplicates and item[7] != 'NULL'%}
+      <TD class="c1">MATCH</TD>
+   {% else %}
+      <TD class="c2">NO MATCH</TD>
+   {% endif %}
+
+   {%if item[8] in duplicates and item[8] != 'NULL'%}
+      <TD class="c1">MATCH</TD>
+   {% else %}
+      <TD class="c2">NO MATCH</TD>
+   {% endif %}
+
+   {%if item[9] in duplicates and item[9] != 'NULL'%}
+      <TD class="c1">{{item[9]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[9]}}</TD>
+   {% endif %}
+
+   {%if item[10] in duplicates and item[10] != 'NULL'%}
+      <TD class="c1">{{item[10]}}</TD>
+   {% else %}
+      <TD class="c2">{{item[10]}}</TD>
+   {% endif %}
+
+   {%if item[11] in duplicates and item[11] != 'NULL'%}
+      <TD class="c1">MATCH</TD>
+   {% else %}
+      <TD class="c2">NO MATCH</TD>
+   {% endif %}
+
+</TR>
+{% endfor %}
+</table>
+
+<h1>Here</h1>
+
+<div id="graph"></div>
 <script>
-    // Embed the Flask template variable into your JavaScript code
-    var graph = {{ graph|tojson|safe }};
+// Embed the Flask template variable into your JavaScript code
+var graph = {{ graph3|tojson|safe }};
 
-    // Create SVG
-    var svg = d3.select("#graph").append("svg")
-        .attr("width", 800)
-        .attr("height", 600);
+console.log(graph);
 
-    var g = svg.append("g");
+// Create SVG
+var svg = d3.select("#graph").append("svg")
+    .attr("width", 800)
+    .attr("height", 600);
 
-    // Specify a layout for the nodes
-    var nodeLayout = d3.scalePoint()
-        .domain(graph.nodes.map(function(d) { return d.account_id; }))
-        .range([0, 800]);  // Adjust this range to fit your SVG dimensions
+var g = svg.append("g");
 
-    // Create the nodes
-    g.selectAll(".node")
-        .data(graph.nodes)
-        .enter()
-        .append("circle")
-        .attr("class", "node")
-        .attr("r", 5)
-        .attr("cx", function(d) { return nodeLayout(d.account_id); })
-        .attr("cy", 300);  // Adjust this value to fit your SVG dimensions
+// Create the nodes
+var nodes = g.selectAll(".node")
+    .data(graph.nodes)
+    .enter()
+    .append("circle")
+    .attr("class", "node")
+    .attr("r", 15)
+    .attr("cx", function(d) { return d.x; })
+    .attr("cy", function(d) { return d.y; })
+    .append("text")
+    .text(function(d) {return d.account_id; });
 
-    // Create the edges
-    g.selectAll(".edge")
-        .data(graph.relationships)
-        .enter()
-        .append("line")
-        .attr("class", "edge")
-        .attr("x1", function(d) { return nodeLayout(d.startNode.account_id); })
-        .attr("y1", 300)  // Adjust this value to fit your SVG dimensions
-        .attr("x2", function(d) { return nodeLayout(d.endNode.account_id); })
-        .attr("y2", 300); // Adjust this value to fit your SVG dimensions
+// Add node labels
+nodes.append("title")
+    .text(function(d) { return d.account_id; });
+
+// Create the edges
+var edges = g.selectAll(".edge")
+    .data(graph.relationships)
+    .enter()
+    .append("line")
+    .attr("class", "edge")
+    .attr("x1", function(d) { return findNode(d.startNode).x; })
+    .attr("y1", function(d) { return findNode(d.startNode).y; })
+    .attr("x2", function(d) { return findNode(d.endNode).x; })
+    .attr("y2", function(d) { return findNode(d.endNode).y; });
+
+// Add edge labels
+edges.append("title")
+    .text(function(d) { return d.type; });
+
+// Helper function to find a node by its account_id
+function findNode(account_id) {
+    return graph.nodes.find(node => node.account_id === account_id);
+}
 </script>
+<!-- <h5>Results {{results}} </h5><br>
+
+<h5>Data <pre> {{data}} </pre> </h5>
+
+<h5>Data2 <pre> {{data2}} </pre> </h5>
+
+<h5>Graph <pre> {{graph}} </pre> </h5>
+
+<h5>Graph2 <pre> {{graph2}} </pre> </h5>
+
+<h5>Graph3 <pre> {{graph3}} </pre> </h5> -->
+
+</body>
