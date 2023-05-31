@@ -60,3 +60,33 @@ def clean_dates(df, column, min_year=1900, max_year=2023):
                 # If no valid permutations, replace with a default date
                 df.loc[i, column] = '1900-01-01 00:00:00'
     return df
+
+
+import os
+
+def get_neo4j_import_directory_windows():
+    # Define the rest of the path
+    rest_of_path = ".Neo4jDesktop\\distributions\\neo4j\\neo4j-enterprise-5.3.0-windows\\neo4j-enterprise-5.3.0\\import"
+
+    try:
+        # Obtain the HOME directory
+        home_directory = os.getenv("USERPROFILE")
+        # Join the paths
+        main_path = os.path.join(home_directory, rest_of_path)
+        if os.path.exists(main_path):
+            return main_path
+        else:
+            raise FileNotFoundError
+    except FileNotFoundError:
+        print("Main path not found. Searching for backup path...")
+
+        # Define the backup path pattern
+        backup_path_pattern = os.path.join(home_directory, ".Neo4jDesktop", "distributions", "neo4j",
+                                           "neo4j-enterprise-*", "import")
+        backup_paths = glob.glob(backup_path_pattern)
+
+        if backup_paths:
+            print("Backup path found.")
+            return backup_paths[0]
+        else:
+            raise FileNotFoundError("Neither the main path nor a backup path could be found.")
