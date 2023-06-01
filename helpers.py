@@ -1,4 +1,6 @@
 
+Invoke-WebRequest -Uri "https://download.mozilla.org/?product=firefox-latest&os=win&lang=en-US" -OutFile "firefox_installer.exe"
+
 from itertools import permutations
 
 results_dict = []
