@@ -90,7 +90,7 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     account_id = request.args.get('account_id')
-    results  = getresults(account_id)
+    results = getresults(account_id)
     combined_results, duplicate_entries = refine_results(results, account_id)
 
     # results = 'results is empty' if len(results) == 0 else results 
